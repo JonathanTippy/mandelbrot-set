@@ -770,6 +770,18 @@ mod mutant_kill {
         assert!((f64::from(IntExp::from(5usize)) - 10.0).abs() < 1e-12);
     }
 
+    /// Zero is zero at any exp. `From<usize>` still stores exp:1; that is encoding, not value.
+    #[test]
+    fn mutant_kill_intexp_zero_encoding() {
+        assert_eq!(IntExp::ZERO.val, Integer::ZERO);
+        assert_eq!(IntExp::ZERO.exp, 0);
+        assert_eq!(IntExp::ZERO, IntExp::from(0i32));
+        assert_eq!(IntExp::ZERO, IntExp::from(0isize));
+        assert_eq!(IntExp::ZERO, IntExp::from(0usize));
+        assert_eq!(IntExp::from(0isize).exp, 0);
+        assert_eq!(IntExp::from(0usize).exp, 1);
+    }
+
     /// Thought-killed pins: Sub/Mul/Shl/Shr/round/set_precision arithmetic.
     #[test]
     fn mutant_kill_intexp_sub_mul_shl_shr_round_precision() {
