@@ -23,3 +23,4 @@ charter-heavy. Grind house numeric files first (`range.rs`, `utils.rs`,
 | 0 | Baseline + pause ghost | Hunt opened; stack in `work-stack.md` | **4307** |
 | 1 | `utils` + `range` MUST_INTEGER + `floatexp` add | Pins landed; house mutants re-run in `mutants.out/tick1-house.log` | pending |
 | 2 | `utils` `IntExp::ZERO` / `From<0>` | Pin `mutant_kill_intexp_zero_encoding`: value-eq is 0 at any exp; `From<usize>(0)` still stores exp:1. No generated `ZERO` mutants; `From`→`Default` is unviable. Did not run the 414-mutant full-file pass. | — |
+| 3 | Baseline file presence | `mutants.out/missed.txt` is empty in this workspace (0 lines). Hunt cannot grind the 4307-line 2026-08-14 list until that artifact is restored. | unknown |
