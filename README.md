@@ -1,4 +1,4 @@
-[![Leaderboard](https://my.kmf-lab.com/leaderboard/static/badge/JonathanTippy.svg)](https://my.kmf-lab.com/leaderboard/JonathanTippy/critical-zoomer)
+[![Leaderboard](https://my.kmf-lab.com/leaderboard/static/badge/leaderboard/JonathanTippy/critical-zoomer.svg)](https://my.kmf-lab.com/leaderboard/JonathanTippy/critical-zoomer)
 [![Honor board](https://my.kmf-lab.com/leaderboard/static/badge/honor/JonathanTippy.svg)](https://my.kmf-lab.com/leaderboard/honor/JonathanTippy)
 [![Dashboard](https://my.kmf-lab.com/leaderboard/static/badge/dashboard/JonathanTippy.svg)](https://my.kmf-lab.com/leaderboard/dashboard)
 
