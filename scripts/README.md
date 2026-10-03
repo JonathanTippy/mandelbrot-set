@@ -10,6 +10,7 @@ Assistant-owned helpers. Not a second test suite. No checked-in PNGs.
 | `screenshot_session.sh` / `screenshot_session_lib.sh` | Private start/send/stop for that screenshot check. |
 | `coverage.sh` | llvm-cov region report. |
 | `mutants.sh` | scoped cargo-mutants (unit tests only; `.cargo/mutants.toml` applies `--lib` skip + `profile = "mutants"` so raw `cargo mutants` does not opt-3). |
+| `build_deb.sh` | Release binary + `.deb` under `packaging/`. Isolated cargo target. |
 | `README.md` | This. |
 
 Do not add e2e shell suites or commit capture artifacts. Prefer `cargo test` / `cargo bench` for product checks; `full_check.sh` is the one wrapper that runs those.

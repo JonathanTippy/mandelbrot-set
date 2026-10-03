@@ -1,0 +1,9 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Critical Zoomer
+Upstream-Contact: Jonathan Tippy
+Source: https://github.com/JonathanTippy/mandelbrot-set
+
+Files: *
+Copyright: 2023 JonathanTippy
+License: proprietary
+ All rights reserved.

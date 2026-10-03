@@ -1,23 +1,29 @@
 Source: critical-zoomer
 Section: graphics
 Priority: optional
-Maintainer: Jonathan <jonathan@localhost>
+Maintainer: Jonathan Tippy <jonathan@localhost>
 Build-Depends: debhelper-compat (= 13),
                cargo,
                rustc,
                libssl-dev,
-               pkg-config
+               pkg-config,
+               libgmp-dev,
+               libmpfr-dev,
+               libclang-dev,
+               libxkbcommon-dev
 Standards-Version: 4.6.2
-Homepage: https://github.com/jonathan/critical-zoomer
+Homepage: https://github.com/JonathanTippy/mandelbrot-set
 Rules-Requires-Root: no
 
 Package: critical-zoomer
-Architecture: amd64
+Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends},
          libvulkan1 | vulkan-loader,
          libwayland-client0,
-         libx11-6
+         libx11-6,
+         libxkbcommon0,
+         libegl1 | libgl1
 Description: GPU-accelerated Mandelbrot set explorer
  Critical Zoomer explores the Mandelbrot set with seamless deep zoom,
  GPU-accelerated perturbation rendering, and a focus on speed and

@@ -5,7 +5,7 @@ Assistant-owned notes for building Flatpak and Debian packages from the repo roo
 ## Prerequisites
 
 - **Flatpak:** `flatpak`, `flatpak-builder`, Flathub runtime/SDK 24.08, Rust SDK extension
-- **Debian:** `debhelper`, `cargo`, `rustc`, `libssl-dev`, `pkg-config`
+- **Debian:** `cargo`, `rustc`, `dpkg-dev`, `libssl-dev`, `pkg-config` (`debhelper` only if using `dpkg-buildpackage`)
 - **Icon:** `icons/assembly_chain_crosshair.png` (512×512; generated from the SVG if missing)
 
 ## Flatpak
@@ -36,17 +36,24 @@ flatpak run com.criticalzoomer.CriticalZoomer
 
 ## Debian (.deb, amd64)
 
-From the repository root, with `packaging/debian` as the Debian directory:
+Preferred path (does not need `debhelper` on the build host):
 
 ```bash
-export DEBIAN_DIRECTORY=packaging/debian
-taskset -c 3-8 dpkg-buildpackage -b -us -uc
+taskset -c 3-8 scripts/build_deb.sh
 ```
 
-The binary package `critical-zoomer_0.0.8_amd64.deb` appears in the parent directory. Install with:
+That writes `packaging/critical-zoomer_<version>_<arch>.deb`. Install with:
 
 ```bash
-sudo dpkg -i ../critical-zoomer_0.0.8_amd64.deb
+sudo dpkg -i packaging/critical-zoomer_0.0.11_amd64.deb
+```
+
+If `debhelper` is installed, `dpkg-buildpackage` can also be used after linking
+`debian` to `packaging/debian`:
+
+```bash
+ln -sfn packaging/debian debian
+taskset -c 3-8 dpkg-buildpackage -b -us -uc
 ```
 
 Installed artifacts:

@@ -1,12 +1,23 @@
 #!/usr/bin/make -f
 
 export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+export CARGO_TARGET_DIR = $(CURDIR)/debian/.cargo-target
 
 %:
 	dh $@ --debian-directory=packaging/debian
 
 override_dh_auto_build:
-	cargo build --release
+	cargo build --release --bin critical_zoomer
 
 override_dh_auto_test:
 	# Packaging build skips the full test suite; CI covers tests separately.
+
+override_dh_auto_install:
+	install -Dm755 $(CARGO_TARGET_DIR)/release/critical_zoomer \
+		debian/critical-zoomer/usr/bin/critical_zoomer
+	install -Dm644 packaging/critical-zoomer.desktop \
+		debian/critical-zoomer/usr/share/applications/com.criticalzoomer.CriticalZoomer.desktop
+	install -Dm644 icons/assembly_chain_crosshair.png \
+		debian/critical-zoomer/usr/share/icons/hicolor/512x512/apps/com.criticalzoomer.CriticalZoomer.png
+	install -Dm644 packaging/com.criticalzoomer.CriticalZoomer.metainfo.xml \
+		debian/critical-zoomer/usr/share/metainfo/com.criticalzoomer.CriticalZoomer.metainfo.xml
