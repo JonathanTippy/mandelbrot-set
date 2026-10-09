@@ -4,8 +4,8 @@ No authoritative unit file beyond thin headgroup notes. Non-authoritative.
 
 ## Window / viewport (UD-UI-WIN-1) — inferred
 
-- Default 800×480; do not restore customized size on launch.
-- One viewport covers the window; resizes with window.
+- Default 854×480; do not restore customized size on launch.
+- One viewport covers the window. Work texture fits inside default res at the window aspect; the blit scales to fill.
 - Headgroup frame cap 60fps.
 
 ## Movement (UD-UI-MOVE-1) — inferred

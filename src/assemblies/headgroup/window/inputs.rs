@@ -15,6 +15,20 @@ pub struct MouseDragStart {
     pub screenspace_drag_start: Pos2
 }
 
+fn window_pos_to_work(pos: Pos2, window: (f32, f32), work: (usize, usize)) -> (i32, i32) {
+    let x = if window.0 > 0.0 {
+        pos.x * (work.0 as f32) / window.0
+    } else {
+        0.0
+    };
+    let y = if window.1 > 0.0 {
+        pos.y * (work.1 as f32) / window.1
+    } else {
+        0.0
+    };
+    (x as i32, y as i32)
+}
+
 pub fn parse_inputs(
     ctx: &egui::Context
     , state: &mut WindowState
@@ -32,17 +46,18 @@ pub fn parse_inputs(
     let ppp = ctx.pixels_per_point();
 
     let min_size = min(state.size.x as u32, state.size.y as u32) as f32;
+    let window = (state.size.x, state.size.y);
 
     ctx.input(|input_state| {
         if let Some(pos) = input_state.pointer.latest_pos() {
-            // Pointer on the window: clamp to the sampling screen. Off-window
-            // leaves attention as None so the worker spirals from screen center.
+            // Pointer on the window, reported in work-texture pixels.
+            // Off-window leaves attention as None so the worker spirals from screen center.
             if pos.x >= 0.0
                 && pos.y >= 0.0
-                && (pos.x as usize) < sampling_size.0
-                && (pos.y as usize) < sampling_size.1
+                && pos.x < window.0
+                && pos.y < window.1
             {
-                returned.1 = Some((pos.x as i32, pos.y as i32));
+                returned.1 = Some(window_pos_to_work(pos, window, sampling_size));
             }
         }
 
@@ -59,6 +74,8 @@ pub fn parse_inputs(
                     // execute the drag
 
                     let pos = input_state.pointer.latest_pos().unwrap();
+                    let pos = window_pos_to_work(pos, window, sampling_size);
+                    let pos = Pos2 { x: pos.0 as f32, y: pos.1 as f32 };
 
                     let offset = (
                         (start.1.x as i32) // * min_size_recip
@@ -108,6 +125,8 @@ pub fn parse_inputs(
                 (input_state.pointer.primary_pressed() && (!input_state.pointer.button_down(egui::PointerButton::Middle)))
                     || (input_state.pointer.button_pressed(egui::PointerButton::Middle) && (!input_state.pointer.primary_down())) {
                     let d = input_state.pointer.latest_pos().unwrap();
+                    let d_work = window_pos_to_work(d, window, sampling_size);
+                    let d = Pos2 { x: d_work.0 as f32, y: d_work.1 as f32 };
 
                     let offset = (
                         (d.x as i32) // * min_size_recip
@@ -162,10 +181,11 @@ pub fn parse_inputs(
             //info!("scrolling");
 
             let c = input_state.pointer.latest_pos().unwrap();
+            let c = window_pos_to_work(c, window, sampling_size);
 
             let c = (
-                c.x // * (1<<16) as f32 / min_size
-                , c.y // * (1<<16) as f32 / min_size
+                c.0 as f32 // * (1<<16) as f32 / min_size
+                , c.1 as f32 // * (1<<16) as f32 / min_size
             );
 
             returned.0.push(

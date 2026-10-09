@@ -367,7 +367,14 @@ impl<A: SteadyActor> eframe::App for EguiWindowPassthrough<'_, A> {
 
             let mut got_new_view = false;
 
-            let size = (state.size.x as usize, state.size.y as usize);
+            // Window can grow; work texture stays inside DEFAULT_WINDOW_RES
+            // with the window's aspect, then egui scales it to fill.
+            let window = (
+                state.size.x.max(1.0) as u32,
+                state.size.y.max(1.0) as u32,
+            );
+            let work = fit_work_res(window, DEFAULT_WINDOW_RES);
+            let size = (work.0 as usize, work.1 as usize);
             let pixels = size.0 * size.1;
 
             let mut sampler_buffer = Vec::with_capacity(pixels);
@@ -419,7 +426,7 @@ impl<A: SteadyActor> eframe::App for EguiWindowPassthrough<'_, A> {
             {
                 let key = (
                     state.sampling_context.location.clone(),
-                    (state.size.x as usize, state.size.y as usize),
+                    size,
                 );
                 // Duplicate stencils (same loc/res) must not Replace — that restarts
                 // work. Exact key only; continuum still flows Views/attention/settings.
@@ -458,7 +465,12 @@ impl<A: SteadyActor> eframe::App for EguiWindowPassthrough<'_, A> {
             }
 
             let (mut command_package, pointer) = parse_inputs(&ctx, &mut state, size);
-            let gaze = state.gaze.tick((size.0 as f32, size.1 as f32));
+            let gaze = state.gaze.tick((window.0 as f32, window.1 as f32)).map(|(x, y)| {
+                (
+                    (x as i64 * work.0 as i64 / window.0.max(1) as i64) as i32,
+                    (y as i64 * work.1 as i64 / window.1.max(1) as i64) as i32,
+                )
+            });
             let attention = AttentionFocus { pointer, gaze };
             // Same attention value need not resend; changing attention still flows.
             if attention != state.last_attention {
@@ -664,7 +676,7 @@ impl<A: SteadyActor> eframe::App for EguiWindowPassthrough<'_, A> {
                 );
 
                 if let Some(toast) = state.gaze.toast_text() {
-                    let sampling = (size.0 as f32, size.1 as f32);
+                    let sampling = (state.size.x, state.size.y);
                     let calibrating = matches!(state.gaze.phase, gaze::GazePhase::Calibrating { .. });
                     egui::Area::new(egui::Id::new("gaze_toast"))
                         .anchor(egui::Align2::CENTER_TOP, egui::vec2(0.0, 12.0))
@@ -699,10 +711,7 @@ impl<A: SteadyActor> eframe::App for EguiWindowPassthrough<'_, A> {
                             .inner_margin(egui::Margin::symmetric(8, 6))
                             .show(ui, |ui| {
                                 ui.set_min_width(520.0);
-                                let screen = (
-                                    state.size.x.max(1.0) as u32
-                                    , state.size.y.max(1.0) as u32
-                                );
+                                let screen = (work.0, work.1);
                                 let (cre, cim) = viewport_center(
                                     &state.sampling_context.location
                                     , screen

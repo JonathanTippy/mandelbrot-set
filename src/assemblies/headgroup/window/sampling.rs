@@ -44,6 +44,27 @@ pub struct SamplingContext {
     , pub mouse_drag_start: Option<(ObjectivePosAndZoom, Pos2)>
 }
 
+/// Largest integer size with `window` aspect that fits in `max`.
+/// Window already inside `max` stays 1:1. Temp pipeline cap: default box.
+pub fn fit_work_res(window: (u32, u32), max: (u32, u32)) -> (u32, u32) {
+    let (ww, wh) = window;
+    let (mw, mh) = max;
+    if ww == 0 || wh == 0 || mw == 0 || mh == 0 {
+        return (1, 1);
+    }
+    if ww <= mw && wh <= mh {
+        return (ww, wh);
+    }
+    // Wider than the box → width hits `mw` first.
+    if (ww as u64) * (mh as u64) >= (mw as u64) * (wh as u64) {
+        let h = ((wh as u64) * (mw as u64) / (ww as u64)).max(1);
+        (mw, (h as u32).min(mh))
+    } else {
+        let w = ((ww as u64) * (mh as u64) / (wh as u64)).max(1);
+        ((w as u32).min(mw), mh)
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct ViewportLocation {
     pub pos: (i32, i32) // This is objective
@@ -422,5 +443,24 @@ mod mutant_kill {
         assert_eq!(optional_index_from_relative_location((3, 2), res, 1), Some(11));
         assert_eq!(optional_index_from_relative_location((4, 0), res, 1), None);
         assert_eq!(optional_index_from_relative_location((-1, 1), res, 100), None);
+    }
+
+    #[test]
+    fn fit_work_res_caps_inside_default_box() {
+        use crate::constants::DEFAULT_WINDOW_RES;
+        let max = DEFAULT_WINDOW_RES;
+        assert_eq!(fit_work_res(max, max), max);
+        assert_eq!(fit_work_res((400, 300), max), (400, 300));
+        assert_eq!(fit_work_res((0, 1080), max), (1, 1));
+        // 1920×1080 is slightly taller than 854×480 → height-limited.
+        assert_eq!(fit_work_res((1920, 1080), max), (853, 480));
+        assert_eq!(fit_work_res((2560, 1080), max), (854, 360));
+        assert_eq!(fit_work_res((1080, 1920), max), (270, 480));
+        let wide = fit_work_res((3840, 1080), max);
+        assert!(wide.0 <= max.0 && wide.1 <= max.1);
+        assert_eq!(wide.0, max.0);
+        let tall = fit_work_res((800, 2000), max);
+        assert!(tall.0 <= max.0 && tall.1 <= max.1);
+        assert_eq!(tall.1, max.1);
     }
 }
