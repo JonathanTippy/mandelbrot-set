@@ -128,6 +128,8 @@ pub struct WindowState {
     , pub gaze: gaze::GazeSession
     // Last stencil location+res actually sent (skip duplicate Replace).
     , pub last_sent_stencil_key: Option<(ObjectivePosAndZoom, (usize, usize))>
+    // F3 toggles the top-left HUD overlay. Starts on.
+    , pub hud_overlay_visible: bool
 }
 
 /// Entry point for the window actor.
@@ -213,6 +215,7 @@ async fn internal_behavior<A: SteadyActor>(
         , last_attention: AttentionFocus::default()
         , gaze: gaze::GazeSession::new()
         , last_sent_stencil_key: None
+        , hud_overlay_visible: true
     }).await;
 
     {
@@ -562,6 +565,7 @@ impl<A: SteadyActor> eframe::App for EguiWindowPassthrough<'_, A> {
                 //info!("took {:.3}ms", start.elapsed().as_secs_f64()*1000.0);
 
                 // Add a transparent text block in the top-left corner for debug info
+                if state.hud_overlay_visible {
                 ui.put(
                     egui::Rect::from_min_size(
                         egui::pos2(10.0, 10.0),
@@ -674,6 +678,7 @@ impl<A: SteadyActor> eframe::App for EguiWindowPassthrough<'_, A> {
                         }).inner
                     }
                 );
+                }
 
                 if let Some(toast) = state.gaze.toast_text() {
                     let sampling = (state.size.x, state.size.y);

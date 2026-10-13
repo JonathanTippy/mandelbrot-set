@@ -11,6 +11,7 @@ No authoritative unit file beyond thin headgroup notes. Non-authoritative.
 ## Movement (UD-UI-MOVE-1) — inferred
 
 WASD, arrows, LMB drag. Pan uses elapsed time (headgroup supplement).
+F3 toggles the top-left HUD overlay.
 
 ## Zoom (UD-UI-ZOOM-1) — inferred
 

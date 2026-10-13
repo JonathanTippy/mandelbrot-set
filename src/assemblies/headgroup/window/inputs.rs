@@ -219,6 +219,10 @@ pub fn parse_inputs(
             , exp: -10
         };
 
+        if input_state.key_pressed(egui::Key::F3) {
+            state.hud_overlay_visible = !state.hud_overlay_visible;
+        }
+
         if input_state.key_down(egui::Key::S)
             && !input_state.key_pressed(egui::Key::S)
             && delta.val != 0
